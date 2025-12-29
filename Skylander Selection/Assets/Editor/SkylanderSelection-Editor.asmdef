@@ -1,7 +1,7 @@
 {
-  "name": "SkylanderElimination-Editor",
+  "name": "SkylanderSelection-Editor",
   "references": [
-    "SkylanderElimination"
+    "SkylanderSelection"
   ],
   "includePlatforms": [
     "Editor"

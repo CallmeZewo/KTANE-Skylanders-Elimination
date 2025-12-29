@@ -9,7 +9,7 @@ using ZT = ZToolsKtane;
 using Rnd = UnityEngine.Random;
 using Math = ExMath;
 
-public class SkylanderElimination : MonoBehaviour
+public class SkylanderSelection : MonoBehaviour
 {
 
     public KMBombInfo Bomb;

@@ -59,7 +59,7 @@ GameObject:
   - component: {fileID: 114433728160993740}
   - component: {fileID: 114935346803180640}
   m_Layer: 0
-  m_Name: Skylander Elimination
+  m_Name: Skylander Selection
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -9,6 +9,7 @@ using ZT = ZToolsKtane;
 using Rnd = UnityEngine.Random;
 using Math = ExMath;
 using ZToolsKtane;
+using static Enums;
 
 public class SkylanderSelection : MonoBehaviour
 {
@@ -44,6 +45,9 @@ public class SkylanderSelection : MonoBehaviour
 
     void Start()
     { //Shit that you calculate, usually a majority if not all of the module
+        MakeSkylander();
+        MakeElements();
+        MakeChapter();
         RandomizeModule();
         SetRandom();
         GetStageRules();
@@ -54,25 +58,72 @@ public class SkylanderSelection : MonoBehaviour
 
     }
 
-    public List<Sprite> Elements = new List<Sprite>();
-    public List<Sprite> Skylander = new List<Sprite>();
-    public List<Sprite> Chapter = new List<Sprite>();
+    static readonly string[] VennTable =
+    {
+        "", // Not used
+        "B", "I", "E", "F",
+        "K", "O", "M", "A",
+        "C", "L", "H", "D",
+        "G", "N", "J"
+    };
+
+    // Lists holding sprites
+
+    public List<Sprite> ElementSprites = new List<Sprite>();
+    public List<Sprite> SkylanderSprites = new List<Sprite>();
+    public List<Sprite> ChapterSprites = new List<Sprite>();
+
+    // Catchphrases
 
     public List<AudioClip> SkylanderCatchphrases = new List<AudioClip>();
     public AudioClip DarkSpyroCatchphrase = new AudioClip();
 
-    List<Sprite> randomElements = new List<Sprite>();
-    List<Sprite> randomSkylander = new List<Sprite>();
-    Sprite randomChapter;
+    // Lists of pre made classes
+
+    List<SkylanderClass> SkylanderList = new List<SkylanderClass>();
+    List<ElementClass> ElementList = new List<ElementClass>();
+    List<ChapterClass> ChapterList = new List<ChapterClass>();
+
+    //randomly picked selection
+
+    List<ElementClass> randomElements = new List<ElementClass>();
+    List<SkylanderClass> randomSkylander = new List<SkylanderClass>();
+    ChapterClass randomChapter;
 
     int Stage = 1;
 
+    void MakeSkylander()
+    {
+        for (int i = 0; i < SkylanderSprites.Count; i++)
+        {
+            SkylanderList.Add(new SkylanderClass(SkylanderSprites[i], (ElementEnum)(i / 4), SkylanderCatchphrases[i]));
+        }
+    }
+
+    void MakeElements()
+    {
+        for (int i = 0;i < ElementSprites.Count; i++)
+        {
+            ElementList.Add(new ElementClass(ElementSprites[i], (ElementEnum)i));
+        }
+    }
+
+    void MakeChapter()
+    {
+        for(int i = 0;i < ChapterSprites.Count; i++)
+        {
+            ChapterList.Add(new ChapterClass(ChapterSprites[i], i));
+        }
+    }
+
     void RandomizeModule()
     {
-        randomElements = ZRandom.PickRandomN(Elements, 4);
-        randomSkylander = ZRandom.PickRandomN(Skylander, 4);
-        randomChapter = ZRandom.PickRandom(Chapter);
+        randomElements = ZRandom.PickRandomN(ElementList, 4);
+        randomSkylander = ZRandom.PickRandomN(SkylanderList, 4);
+        randomChapter = ZRandom.PickRandom(ChapterList);
     }
+
+    // Sprites
 
     public SpriteRenderer SkylanderSprite1;
     public SpriteRenderer SkylanderSprite2;
@@ -86,6 +137,8 @@ public class SkylanderSelection : MonoBehaviour
 
     public SpriteRenderer ChapterSprite;
 
+    // Button objects
+
     public GameObject BigButton1;
     public GameObject BigButton2;
     public GameObject BigButton3;
@@ -96,18 +149,6 @@ public class SkylanderSelection : MonoBehaviour
     public GameObject SmallButton3;
     public GameObject SmallButton4;
 
-    // Saving what index the Skylander is from the list
-    int SkylanderIndex1;
-    int SkylanderIndex2;
-    int SkylanderIndex3;
-    int SkylanderIndex4;
-    
-    // Saving waht index the Element is from the list
-    int ElementIndex1;
-    int ElementIndex2;
-    int ElementIndex3;
-    int ElementIndex4;
-
     string RuleStage1;
     string RuleStage2;
     string RuleStage3;
@@ -115,32 +156,23 @@ public class SkylanderSelection : MonoBehaviour
 
     void SetRandom()
     {
-        SkylanderIndex1 = Skylander.IndexOf(randomSkylander[0]);
-        SkylanderIndex2 = Skylander.IndexOf(randomSkylander[1]);
-        SkylanderIndex3 = Skylander.IndexOf(randomSkylander[2]);
-        SkylanderIndex4 = Skylander.IndexOf(randomSkylander[3]);
 
-        ElementIndex1 = Elements.IndexOf(randomElements[0]);
-        ElementIndex2 = Elements.IndexOf(randomElements[1]);
-        ElementIndex3 = Elements.IndexOf(randomElements[2]);
-        ElementIndex4 = Elements.IndexOf(randomElements[3]);
+        SkylanderSprite1.sprite = randomSkylander[0].Sprite;
+        SetButtonColor(randomSkylander[0].Element, BigButton1);
 
-        SkylanderSprite1.sprite = randomSkylander[0];
-        SetButtonColor(SkylanderIndex1, BigButton1);
+        SkylanderSprite2.sprite = randomSkylander[1].Sprite;
+        SetButtonColor(randomSkylander[1].Element, BigButton2);
 
-        SkylanderSprite2.sprite = randomSkylander[1];
-        SetButtonColor(SkylanderIndex2, BigButton2);
+        SkylanderSprite3.sprite = randomSkylander[2].Sprite;
+        SetButtonColor(randomSkylander[2].Element, BigButton3);
 
-        SkylanderSprite3.sprite = randomSkylander[2];
-        SetButtonColor(SkylanderIndex3, BigButton3);
+        SkylanderSprite4.sprite = randomSkylander[3].Sprite;
+        SetButtonColor(randomSkylander[3].Element, BigButton4);
 
-        SkylanderSprite4.sprite = randomSkylander[3];
-        SetButtonColor(SkylanderIndex4, BigButton4);
+        ElementSprite1.sprite = randomElements[0].Sprite;
+        SetButtonColor(randomElements[0].Element, SmallButton1);
 
-        ElementSprite1.sprite = randomElements[0];
-        SetButtonColor(ElementIndex1 * 4, SmallButton1);
-
-        ChapterSprite.sprite = randomChapter;
+        ChapterSprite.sprite = randomChapter.Sprite;
     }
 
     void GetStageRules()
@@ -150,49 +182,46 @@ public class SkylanderSelection : MonoBehaviour
         bool lifeOrWater = false;
         bool magicOrTech = false;
 
-        if (ElementIndex1 == 0 || ElementIndex1 == 2)
-            airOrFire = true;
-        if (ElementIndex1 == 1 || ElementIndex1 == 6)
-            earthOrUndead = true;
-        if (ElementIndex1 == 3 || ElementIndex1 == 7)
-            lifeOrWater = true;
-        if (ElementIndex1 == 4 || ElementIndex1 == 5)
-            magicOrTech = true;
-
+        SetElement(randomElements[0].Element, ref airOrFire, ref earthOrUndead, ref lifeOrWater, ref magicOrTech);
         RuleStage1 = VennCalc(airOrFire, earthOrUndead, lifeOrWater, magicOrTech);
 
-        if (ElementIndex2 == 0 || ElementIndex2 == 2)
-            airOrFire = true;
-        if (ElementIndex2 == 1 || ElementIndex2 == 6)
-            earthOrUndead = true;
-        if (ElementIndex2 == 3 || ElementIndex2 == 7)
-            lifeOrWater = true;
-        if (ElementIndex2 == 4 || ElementIndex2 == 5)
-            magicOrTech = true;
-
+        SetElement(randomElements[1].Element, ref airOrFire, ref earthOrUndead, ref lifeOrWater, ref magicOrTech);
         RuleStage2 = VennCalc(airOrFire, earthOrUndead, lifeOrWater, magicOrTech);
 
-        if (ElementIndex3 == 0 || ElementIndex3 == 2)
-            airOrFire = true;
-        if (ElementIndex3 == 1 || ElementIndex3 == 6)
-            earthOrUndead = true;
-        if (ElementIndex3 == 3 || ElementIndex3 == 7)
-            lifeOrWater = true;
-        if (ElementIndex3 == 4 || ElementIndex3 == 5)
-            magicOrTech = true;
-
+        SetElement(randomElements[2].Element, ref airOrFire, ref earthOrUndead, ref lifeOrWater, ref magicOrTech);
         RuleStage3 = VennCalc(airOrFire, earthOrUndead, lifeOrWater, magicOrTech);
 
-        if (ElementIndex4 == 0 || ElementIndex4 == 2)
-            airOrFire = true;
-        if (ElementIndex4 == 1 || ElementIndex4 == 6)
-            earthOrUndead = true;
-        if (ElementIndex4 == 3 || ElementIndex4 == 7)
-            lifeOrWater = true;
-        if (ElementIndex4 == 4 || ElementIndex4 == 5)
-            magicOrTech = true;
-
+        SetElement(randomElements[3].Element, ref airOrFire, ref earthOrUndead, ref lifeOrWater, ref magicOrTech);
         RuleStage4 = VennCalc(airOrFire, earthOrUndead, lifeOrWater, magicOrTech);
+
+        Debug.LogFormat(
+        "[Skylander Selection #{0}] Rules: {1}, {2}, {3}, {4}",
+        ModuleId, RuleStage1, RuleStage2, RuleStage3, RuleStage4
+        );
+    }
+
+    void SetElement(ElementEnum e, ref bool aof, ref bool eou, ref bool low, ref bool mot)
+    {
+        switch (e)
+        {
+            case ElementEnum.Air:
+            case ElementEnum.Fire:
+                aof = true;
+                break;
+            case ElementEnum.Earth:
+            case ElementEnum.Undead:
+                eou = true;
+                break;
+            case ElementEnum.Life:
+            case ElementEnum.Water:
+                low = true;
+                break;
+            case ElementEnum.Magic:
+            case ElementEnum.Tech:
+                mot = true;
+                break;
+
+        }
     }
 
     string VennCalc(bool aof, bool eou, bool low, bool mot)
@@ -203,40 +232,9 @@ public class SkylanderSelection : MonoBehaviour
         if (low) output |= 1 << 2;
         if (mot) output |= 1 << 3;
 
-        switch (output)
-        {
-            case 1:
-                return "B";
-            case 2:
-                return "I";
-            case 3:
-                return "E";
-            case 4:
-                return "F";
-            case 5:
-                return "K";
-            case 6:
-                return "O";
-            case 7:
-                return "M";
-            case 8:
-                return "A";
-            case 9:
-                return "C";
-            case 10:
-                return "L";
-            case 11:
-                return "H";
-            case 12:
-                return "D";
-            case 13:
-                return "G";
-            case 14:
-                return "N";
-            case 15:
-                return "J";
-        }
-        return "This never gets called lol";
+        string result = VennTable[output];
+
+        return result;
     }
 
     void SetNewStage()
@@ -246,82 +244,58 @@ public class SkylanderSelection : MonoBehaviour
             case 1:
                 Stage = 2;
 
-                ElementSprite2.sprite = randomElements[1];
-                SetButtonColor(ElementIndex2 * 4, SmallButton2);
+                ElementSprite2.sprite = randomElements[1].Sprite;
+                SetButtonColor(randomElements[1].Element, SmallButton2);
                 break;
             case 2:
                 Stage = 3;
 
-                ElementSprite3.sprite = randomElements[2];
-                SetButtonColor(ElementIndex3 * 4, SmallButton3);
+                ElementSprite3.sprite = randomElements[2].Sprite;
+                SetButtonColor(randomElements[2].Element, SmallButton3);
                 break;
             case 3:
                 Stage = 4;
 
-                ElementSprite4.sprite = randomElements[3];
-                SetButtonColor(ElementIndex4 * 4, SmallButton4);
+                ElementSprite4.sprite = randomElements[3].Sprite;
+                SetButtonColor(randomElements[3].Element, SmallButton4);
                 break;
         }
     }
 
-    void SetButtonColor(int Offset, GameObject button)
+    void SetButtonColor(ElementEnum element, GameObject button)
     {
-        switch (Offset)
+        switch (element)
         {
             //Air
-            case 0:
-            case 1:
-            case 2:
-            case 3:
+            case ElementEnum.Air:
                 button.GetComponent<MeshRenderer>().material.color = new Color(0f, 0.43137f, 0.68627f);
                 break;
             //Earth
-            case 4:
-            case 5:
-            case 6:
-            case 7:
+            case ElementEnum.Earth:
                 button.GetComponent<MeshRenderer>().material.color = new Color(0.49020f, 0.19608f, 0f);
                 break;
             //Fire
-            case 8:
-            case 9:
-            case 10:
-            case 11:
+            case ElementEnum.Fire:
                 button.GetComponent<MeshRenderer>().material.color = new Color(0.68627f, 0f, 0f);
                 break;
             //Life
-            case 12:
-            case 13:
-            case 14:
-            case 15:
+            case ElementEnum.Life:
                 button.GetComponent<MeshRenderer>().material.color = new Color(0f, 0.35294f, 0f);
                 break;
             //Magic
-            case 16:
-            case 17:
-            case 18:
-            case 19:
+            case ElementEnum.Magic:
                 button.GetComponent<MeshRenderer>().material.color = new Color(0.13725f, 0f, 0.19608f);
                 break;
             //Tech
-            case 20:
-            case 21:
-            case 22:
-            case 23:
+            case ElementEnum.Tech:
                 button.GetComponent<MeshRenderer>().material.color = new Color(0.74510f, 0.31373f, 0f);
                 break;
             //Undead
-            case 24:
-            case 25:
-            case 26:
-            case 27:
+            case ElementEnum.Undead:
                 button.GetComponent<MeshRenderer>().material.color = new Color(0.23529f, 0.23529f, 0.29412f);
                 break;
             //Water
-            case 28:
-            case 29:
-            case 30:
-            case 31:
+            case ElementEnum.Water:
                 button.GetComponent<MeshRenderer>().material.color = new Color(0f, 0.11765f, 0.25490f);
                 break;
         }
